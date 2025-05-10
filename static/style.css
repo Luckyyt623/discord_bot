@@ -1,0 +1,51 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #0d1117;
+  color: #e6edf3;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #58a6ff;
+  margin-bottom: 30px;
+}
+
+.leaderboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.server-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(88, 166, 255, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.server-card:hover {
+  transform: scale(1.03);
+}
+
+.server-header {
+  font-weight: bold;
+  color: #ffa657;
+  margin-bottom: 10px;
+}
+
+.player {
+  border-top: 1px solid #30363d;
+  padding: 5px 0;
+  display: flex;
+  justify-content: space-between;
+}
