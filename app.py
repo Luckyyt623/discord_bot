@@ -1,10 +1,25 @@
 import discord
 from discord.ext import commands
 import requests
+from flask import Flask
+from threading import Thread
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
+# Web server for uptime pinging
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Slither.io Bot is alive!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# Discord bot setup
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -39,7 +54,6 @@ async def on_message(message):
             for server in data["dataList"]:
                 if server["ipv4"] == ip and str(server["po"]) == port:
                     leaderboard = server.get("leaderboard", [])
-                    # Format the leaderboard message like a styled HTML output
                     msg = f"**Slither.io Leaderboard - Server: {ip}:{port}**\n"
                     msg += "```\n"
                     msg += "🏆 Leaderboard 🏆\n"
@@ -61,4 +75,6 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-bot.run(os.getenv("Discord_token")) 
+# Start web server and bot
+keep_alive()
+bot.run(os.getenv("DISCORD_TOKEN"))  
