@@ -5,6 +5,8 @@ import logging
 import os
 import asyncio
 from dotenv import load_dotenv
+from flask import Flask, send_file
+import threading
 
 # Load environment variables from .env file
 load_dotenv()
@@ -17,6 +19,9 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="", intents=intents)
+
+# Flask app setup
+app = Flask(__name__)
 
 # Country to IP mapping with approximate coordinates for map
 country_to_ip = {
@@ -239,12 +244,16 @@ country_to_ip = {
 # Store user's last selected country to handle server selection
 user_selection = {}
 
+# Global variable to store the latest bot.html content
+latest_html_content = None
+
 @bot.event
 async def on_ready():
     logger.info(f"Logged in as {bot.user}")
 
 @bot.event
 async def on_message(message):
+    global latest_html_content
     if message.author.bot:
         return
 
@@ -366,12 +375,8 @@ async def on_message(message):
                 msg += "```\n"
                 msg += "_Powered by Slither.io Bot_\n"
 
-                msg += "**Server Map (Simplified)**\n"
-                msg += "```\n"
-                msg += "🌍 [World Map]\n"
-                msg += f"📍 {country.capitalize()} ({ip}:{port})\n"
-                msg += "```\n"
-                msg += "Check `bot.html` for a graphical map!"
+                # Add map link
+                msg += "\n**View Server Map**: [Click Here](https://discord-bot-7ucy.onrender.com/)\n"
                 await asyncio.sleep(1)  # Avoid rate limiting
                 await message.channel.send(msg)
 
@@ -402,10 +407,10 @@ async def on_message(message):
                 <!DOCTYPE html>
                 <html lang="en">
                 <head>
-                    <meta charset="UTF-8">
-                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                     <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Slither.io Leaderboard Bot</title>
-                    <link rel="stylesheet" href="style.css">
+                    <link rel="stylesheet" href="/static/style.css">
                 </head>
                 <body>
                     <div class="container">
@@ -415,15 +420,18 @@ async def on_message(message):
                             {leaderboard_html if leaderboard_html else "<p>No leaderboard data available.</p>"}
                         </div>
                     </div>
-                    <script src="script.js"></script>
+                    <script src="/static/script.js"></script>
                 </body>
                 </html>
                 """
+                # Save the latest HTML content to a global variable for Flask to serve
+                latest_html_content = html_content
+
+                # Save to /tmp for Render compatibility
                 try:
                     with open("/tmp/bot.html", "w", encoding="utf-8") as f:
                         f.write(html_content)
                     logger.info("Successfully generated bot.html in /tmp")
-                    await message.channel.send(f"Leaderboard and map saved to `bot.html`. Note: On Render, you may need to check logs for file access.")
                 except Exception as e:
                     logger.error(f"Failed to write bot.html: {str(e)}")
                     await message.channel.send("Failed to generate `bot.html`. Check bot logs for details.")
@@ -438,6 +446,28 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+# Flask routes
+@app.route('/')
+def serve_map():
+    global latest_html_content
+    if latest_html_content:
+        return latest_html_content
+    return "<h1>No map data available</h1><p>Please use the bot to generate a map first.</p>"
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_file(filename)
+
+# Function to run Flask app in a separate thread
+def run_flask():
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
+# Start Flask in a separate thread
+flask_thread = threading.Thread(target=run_flask)
+flask_thread.start()
+
+# Start Discord bot
 try:
     token = os.getenv("DISCORD_TOKEN")
     if not token:
