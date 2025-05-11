@@ -23,5 +23,5 @@ fetch("https://slither-realtime-leaderboard.pages.dev/api/leaderboard")
   })
   .catch(err => {
     document.getElementById("servers").innerText = "Failed to load leaderboard data.";
-    console.error(err);
+    console.log("Leaderboard loaded. This is a static file. Run the bot again to update data.");
   });
