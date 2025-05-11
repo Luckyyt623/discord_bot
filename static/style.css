@@ -1,51 +1,90 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #0d1117;
-  color: #e6edf3;
-  margin: 0;
-  padding: 0;
+    background-color: #1a1a1a;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
 .container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
+    max-width: 800px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
 }
 
 h1 {
-  text-align: center;
-  color: #58a6ff;
-  margin-bottom: 30px;
+    margin-bottom: 20px;
+    font-size: 2em;
 }
 
-.leaderboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+h2 {
+    margin-bottom: 15px;
+    font-size: 1.5em;
 }
 
-.server-card {
-  background: #161b22;
-  border: 1px solid #30363d;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 0 8px rgba(88, 166, 255, 0.2);
-  transition: transform 0.2s ease;
+ul {
+    list-style: none;
+    margin-bottom: 20px;
 }
 
-.server-card:hover {
-  transform: scale(1.03);
+li {
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+    border-radius: 5px;
+    font-size: 1.1em;
 }
 
-.server-header {
-  font-weight: bold;
-  color: #ffa657;
-  margin-bottom: 10px;
+p {
+    font-size: 1.2em;
+    color: #ffd700;
 }
 
-.player {
-  border-top: 1px solid #30363d;
-  padding: 5px 0;
-  display: flex;
-  justify-content: space-between;
+.map {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: #2c3e50;
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.server-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #ffd700;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    color: #fff;
+    font-size: 0.8em;
+    text-align: center;
+    line-height: 20px;
+}
+
+.server-dot::after {
+    content: attr(title);
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+    font-size: 0.9em;
 }
