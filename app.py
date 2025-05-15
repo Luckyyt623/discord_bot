@@ -105,7 +105,6 @@ country_to_ip = {
         {"ip": "95.216.38.155", "port": "444", "x": "56%", "y": "21%", "number": "3215"},
         {"ip": "95.216.39.140", "port": "444", "x": "57%", "y": "22%", "number": "3739"},
         {"ip": "95.216.39.141", "port": "444", "x": "58%", "y": "23%", "number": "3082"},
-        {"ip": "95.216.38.155", "port": "475", "x": "59%", "y": "24%", "number": "4192"},
         {"ip": "95.216.39.140", "port": "475", "x": "60%", "y": "25%", "number": "5188"},
         {"ip": "95.216.39.141", "port": "443", "x": "61%", "y": "26%", "number": "6873"},
         {"ip": "95.216.38.155", "port": "443", "x": "62%", "y": "27%", "number": "3833"},
@@ -203,7 +202,6 @@ country_to_ip = {
     ],
     "reston": [
         {"ip": "15.204.212.200", "port": "444", "x": "32%", "y": "32%", "number": "7870"},
-        {"ip": "15.204.213.229", "port": "444", "x": "33%", "y": "33%", "number": "2740"},
         {"ip": "15.204.212.200", "port": "475", "x": "34%", "y": "34%", "number": "4863"},
         {"ip": "15.204.213.229", "port": "443", "x": "35%", "y": "35%", "number": "8335"},
         {"ip": "15.204.212.200", "port": "443", "x": "36%", "y": "36%", "number": "6129"},
@@ -277,6 +275,7 @@ async def on_message(message):
         except Exception as e:
             logger.error(f"Unexpected error in #server list: {str(e)}")
             await message.channel.send(f"Error: {str(e)}")
+            return
 
     if message.content.startswith("#server "):
         try:
@@ -310,6 +309,7 @@ async def on_message(message):
         except Exception as e:
             logger.error(f"Unexpected error in #server: {str(e)}")
             await message.channel.send(f"Error: {str(e)}")
+            return
 
     if message.content.startswith("#select "):
         try:
@@ -345,13 +345,13 @@ async def on_message(message):
                 return
 
             ip = selected_server["ip"]
-port = selected_server["port"]
+            port = selected_server["port"]
             server_number = selected_server["number"]
             logger.info(f"User selected server: {ip}:{port} (Number: {server_number}) in {country}")
 
             # Fetch leaderboard data
-            url = "https://slither-realtime-leaderboard.pages.dev/api/leaderboard"
             try:
+                url = "https://slither-realtime-leaderboard.pages.dev/api/leaderboard"
                 response = requests.get(url, timeout=10)
                 response.raise_for_status()
                 data = response.json()
@@ -447,14 +447,16 @@ port = selected_server["port"]
                 except Exception as e:
                     logger.error(f"Failed to write bot.html: {str(e)}")
                     await message.channel.send("Failed to generate `bot.html`. Check bot logs for details.")
-                return
+                break
 
             if not server_found:
                 logger.warning(f"Server {ip}:{port} not found in API response")
                 await message.channel.send(f"Server `{ip}:{port}` not found.")
+
         except Exception as e:
             logger.error(f"Unexpected error in #select: {str(e)}")
             await message.channel.send(f"Error: {str(e)}")
+            return
 
     await bot.process_commands(message)
 
